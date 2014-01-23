@@ -14,6 +14,10 @@ public class GeneratorAxml
 	private static int NODE_ID;
 	private static int LINK_ID;
 	private static HashMap<AbstractRequirement,String> NODE_IDENTIFIER_MAP;
+	public static final int BOX_WIDTH = 5000;
+	public static final int BOX_HEIGHT = 2000;
+	public static final int YMARGIN = 500;
+	public static final int XMARGIN = 500;
 	
 	public static void writeAxmlHeader (WriteToFile report)
 	{
@@ -27,15 +31,16 @@ public class GeneratorAxml
 		report.addOutputNewline("<canvas-units>twips</canvas-units>");
 		report.addOutputNewline("<asce-password></asce-password>");
 		report.addOutputNewline("<tool-version>4.1.7</tool-version>");
-		report.addOutputNewline("<font name=\"Tahoma\" size=\"9pt\"/>");
+		report.addOutputNewline("<font name=\"Tahoma\" size=\"8pt\"/>");
 		report.addOutputNewline("<manual-attach>True</manual-attach>");
 		report.addOutputNewline("</general>");
 	}
 	
-	public static void writeNode (WriteToFile report, AbstractRequirement ar)
+	public static void writeNode (WriteToFile report, AbstractRequirement ar, int xmargin, int ymargin)
 	{
+		generateKey(ar);
 		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(ar)+"\">");
-		report.addOutputNewline("   <layout x=\"3630\" y=\"4905\" height=\"855\" width=\"1290\"/>");
+		report.addOutputNewline("   <layout x=\""+xmargin+"\" y=\""+ymargin+"\" height=\""+BOX_HEIGHT+"\" width=\""+BOX_WIDTH+"\"/>");
 		report.addOutputNewline("   <type>12</type>");
 		report.addOutputNewline("   <user-id><![CDATA["+ar.getName()+"]]></user-id>");
 		report.addOutputNewline("   <user-title><![CDATA["+ar.getDescription()+"]]></user-title>");
@@ -53,7 +58,20 @@ public class GeneratorAxml
 		report.addOutputNewline("	   <status-field type=\"string\" name=\"spectrum2\"><![CDATA[Off]]></status-field>");
 		report.addOutputNewline("   </status-fields>");
 		report.addOutputNewline("   <html-annotation><![CDATA[<p>&nbsp;</p>]]></html-annotation>");
-		report.addOutputNewline("</node>");		
+		report.addOutputNewline("</node>");
+		int newy = ymargin + BOX_HEIGHT + YMARGIN;
+		int newx = 0;
+		for (AbstractRequirement sar : ar.getContainedRequirements())
+		{	
+			writeNode (report, sar, newx, newy);
+			newx = newx + BOX_WIDTH + XMARGIN;
+		}
+		
+//		for (AbstractRequirement sar : ar.get())
+//		{	
+//			writeNode (report, sar, newx, newy);
+//			newx = newx + BOX_WIDTH + XMARGIN;
+//		}
 	}
 	
 	public static void writeLink (WriteToFile report, AbstractRequirement source, AbstractRequirement destination)
@@ -61,8 +79,8 @@ public class GeneratorAxml
 		report.addOutputNewline("<link reference=\"LN"+ LINK_ID +"\">");
 		report.addOutputNewline("   <type>6</type>");
 		report.addOutputNewline("   <strength>1</strength>");
-		report.addOutputNewline("   <source-reference>"+ NODE_IDENTIFIER_MAP.get(source) +"</source-reference>");
-		report.addOutputNewline("   <destination-reference>"+ NODE_IDENTIFIER_MAP.get(destination) +"</destination-reference>");
+		report.addOutputNewline("   <source-reference>"+ NODE_IDENTIFIER_MAP.get(destination) +"</source-reference>");
+		report.addOutputNewline("   <destination-reference>"+ NODE_IDENTIFIER_MAP.get(source) +"</destination-reference>");
 		report.addOutputNewline("   <attachment x-source=\"0.5\" y-source=\"0\" x-destination=\"0.5\" y-destination=\"1\"/>");
 		report.addOutputNewline("</link>");
 		LINK_ID = LINK_ID + 1;
@@ -105,12 +123,8 @@ public class GeneratorAxml
 		Utils.gatherAllSubRequirements (requirement, allSubRequirements);
 		
 		generateKey(requirement);
-		writeNode (report, requirement);
-		for (AbstractRequirement ar : allSubRequirements)
-		{
-			generateKey(ar);
-			writeNode (report, ar);
-		}
+		writeNode (report, requirement, 0, 0);
+
 		report.addOutputNewline("</nodes>");
 		
 		
@@ -118,7 +132,8 @@ public class GeneratorAxml
 		
 		writeLinks (report, requirement);
 		report.addOutputNewline("</links>");
-		
+		report.addOutputNewline("<views/><embedded-images/><export-paths/></asce-network>");
+
 		report.saveToFile();
 	}
 }
