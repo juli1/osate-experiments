@@ -67,6 +67,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
 import org.osate.aadl2.util.OsateDebug;
 import org.osate.analysis.requirements.Activator;
+import org.osate.analysis.requirements.utils.GeneratorAxml;
 import org.osate.analysis.requirements.utils.Utils;
 import org.osgi.framework.Bundle;
 
@@ -238,14 +239,10 @@ public final class GenerateConfidenceMapAction implements IWorkbenchWindowAction
 			for (AbstractRequirement req : rg.getRequirements())
 			{
 				requirementsNameList.add(req.getName());
-				OsateDebug.osateDebug("REQ NAME - " + req.getName());
 			}
 		}
 		
-		for (String s : requirementsNameList)
-		{
-			OsateDebug.osateDebug("REQ NAME - " + s);
-		}
+	
 		
 		final Display d = PlatformUI.getWorkbench().getDisplay();
 		d.syncExec(new Runnable(){
@@ -272,11 +269,15 @@ public final class GenerateConfidenceMapAction implements IWorkbenchWindowAction
 			}
 		}
 		
-		if (requirement != null)
+		if (requirement == null)
 		{
-			OsateDebug.osateDebug(requirement.getId());
-			OsateDebug.osateDebug("selected requirement" + selectedRequirement);
+			//FIXME should show a dialogbox for error
+			OsateDebug.osateDebug("ERROR");
+			return;
 		}
+		
+		GeneratorAxml.generateConfidenceMap (requirement);
+		
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {

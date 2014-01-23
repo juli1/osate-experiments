@@ -17,4 +17,5 @@ Import-Package: fr.openpeople.rdal.model.core.util,
  org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.resource,
  org.osate.aadl2,
+ org.osate.aadl2.modelsupport,
  org.osate.aadl2.util

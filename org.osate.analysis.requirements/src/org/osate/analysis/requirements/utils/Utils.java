@@ -28,6 +28,8 @@
 
 package org.osate.analysis.requirements.utils;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -47,8 +49,10 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PlatformUI;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.modelsupport.WriteToFile;
 import org.osate.aadl2.util.OsateDebug;
 
+import fr.openpeople.rdal.model.core.AbstractRequirement;
 import fr.openpeople.rdal.model.core.Specification;
 import fr.openpeople.rdal.model.core.util.CoreResourceImpl;
 
@@ -70,6 +74,25 @@ public class Utils
 	}
 	
 
+	/**
+	 * take all subrequirements for one requirements. It go through
+	 * the requirements hierarchy and put all of them in a list
+	 * @param requirement   - the root requirement
+	 * @param requirements  - the list that will contain all sub-requirements
+	 */
+	public static void gatherAllSubRequirements (AbstractRequirement requirement, List<AbstractRequirement> requirements)
+	{
+		for (AbstractRequirement req : requirement.getContainedRequirements())
+		{
+			if (!requirements.contains(req))
+			{
+				requirements.add(req);
+			}
+			gatherAllSubRequirements(req, requirements);
+		}
+	}
+
+	
 	public static Resource getResource(IResource ires) {
 		IPath path = ires.getFullPath();
 		return null;
