@@ -47,6 +47,10 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PlatformUI;
 import org.osate.aadl2.Element;
+import org.osate.aadl2.util.OsateDebug;
+
+import fr.openpeople.rdal.model.core.Specification;
+import fr.openpeople.rdal.model.core.util.CoreResourceImpl;
 
 
 public class Utils 
@@ -71,13 +75,9 @@ public class Utils
 		return null;
 	}
 
-	public static Element getSelectedRDALModel ()
+	public static Specification getSelectedRDALModel ()
 	{
-		String selectedFolder;
 		ISelection selection;
-		IFolder selectedIFolder;;
-		
-		selectedFolder = null;
 		
 		 selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getSelection();
 	        if (selection != null) 
@@ -94,29 +94,27 @@ public class Utils
 
 	                    Object lastSegmentObj = treePath.getLastSegment();
 
-	            		if (lastSegmentObj instanceof IFile
-	            				&& (((IFile) lastSegmentObj).getFileExtension()).equalsIgnoreCase("rdal")) {
-	            			Resource res = getResource((IResource) lastSegmentObj);
-	            			EList<EObject> rl = res.getContents();
-	            			if (!rl.isEmpty() && rl.get(0) instanceof Element)
-	            				return (Element) rl.get(0);
+	                    if (lastSegmentObj instanceof CoreResourceImpl)
+	            		{
+	                    	CoreResourceImpl cr = (CoreResourceImpl) lastSegmentObj;
+	                    	return ((Specification)cr.getContents().get(0));
 	            		}
-	                    if(lastSegmentObj instanceof IFolder) 
-	                    {
-	                    	
-	                    	selectedIFolder = (IFolder) ((IAdaptable) lastSegmentObj).getAdapter(IFolder.class);
-	                        if(selectedIFolder != null) 
-	                        {
-	                        	selectedFolder = selectedIFolder.getRawLocation().toOSString();
-	                        }
-	                        
-	                    }
+	                    
+	            		if (lastSegmentObj instanceof IFile
+	            				&& (((IFile) lastSegmentObj).getFileExtension()).equalsIgnoreCase("rdal")) 
+	            		{
+	            			OsateDebug.osateDebug("to be implememted");
+	            			return null;
+	            		}
+	            		
+	            		
+	                    
 	                }
 	            }
 	        	}
 	        	catch (NullPointerException npe)
 	        	{
-	        		selectedFolder = null;
+	        		npe.printStackTrace();
 	        	}
 	        }
 	        return null;

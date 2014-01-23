@@ -7,9 +7,14 @@ Bundle-Activator: org.osate.analysis.requirements.Activator
 Bundle-Vendor: SEI CMU
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.emf.common;bundle-version="2.10.0"
+ org.eclipse.emf.common,
+ fr.openpeople.rdal.model;bundle-version="1.0.0",
+ fr.openpeople.rdalte.osate;bundle-version="1.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.core.resources,
+Import-Package: fr.openpeople.rdal.model.core.util,
+ org.eclipse.core.resources,
+ org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.resource,
+ org.osate.aadl2,
  org.osate.aadl2.util
