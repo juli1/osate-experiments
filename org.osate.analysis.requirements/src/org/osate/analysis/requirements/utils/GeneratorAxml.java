@@ -12,6 +12,7 @@ import fr.openpeople.rdal.model.core.AbstractRequirement;
 public class GeneratorAxml
 {
 	private static int NODE_ID;
+	private static int LINK_ID;
 	private static HashMap<AbstractRequirement,String> NODE_IDENTIFIER_MAP;
 	
 	public static void writeAxmlHeader (WriteToFile report)
@@ -34,25 +35,37 @@ public class GeneratorAxml
 	public static void writeNode (WriteToFile report, AbstractRequirement ar)
 	{
 		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(ar)+"\">");
-		report.addOutputNewline("<layout x=\"3630\" y=\"4905\" height=\"855\" width=\"1290\"/>");
-		report.addOutputNewline("<type>12</type>");
-		report.addOutputNewline("<user-id><![CDATA["+ar.getName()+"]]></user-id>");
-		report.addOutputNewline("<user-title><![CDATA["+ar.getDescription()+"]]></user-title>");
-		report.addOutputNewline("<status-fields>");
-		report.addOutputNewline("	<status-field type=\"boolean\" name=\"hasexternalreference\"><![CDATA[False]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"boolean\" name=\"requiresdevelopment\"><![CDATA[False]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"boolean\" name=\"requiresinstantiation\"><![CDATA[False]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"string\" name=\"defeater\"><![CDATA[No]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"boolean\" name=\"completed\"><![CDATA[False]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"string\" name=\"resourced\"><![CDATA[]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"string\" name=\"comments\"><![CDATA[]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"long\" name=\"risk\"><![CDATA[1]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"string\" name=\"confidence\"><![CDATA[Off]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"string\" name=\"spectrum1\"><![CDATA[Off]]></status-field>");
-		report.addOutputNewline("	<status-field type=\"string\" name=\"spectrum2\"><![CDATA[Off]]></status-field>");
-		report.addOutputNewline("</status-fields>");
-		report.addOutputNewline("<html-annotation><![CDATA[<p>&nbsp;</p>]]></html-annotation>");
+		report.addOutputNewline("   <layout x=\"3630\" y=\"4905\" height=\"855\" width=\"1290\"/>");
+		report.addOutputNewline("   <type>12</type>");
+		report.addOutputNewline("   <user-id><![CDATA["+ar.getName()+"]]></user-id>");
+		report.addOutputNewline("   <user-title><![CDATA["+ar.getDescription()+"]]></user-title>");
+		report.addOutputNewline("   <status-fields>");
+		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"hasexternalreference\"><![CDATA[False]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"requiresdevelopment\"><![CDATA[False]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"requiresinstantiation\"><![CDATA[False]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"defeater\"><![CDATA[No]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"completed\"><![CDATA[False]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"resourced\"><![CDATA[]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"comments\"><![CDATA[]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"long\" name=\"risk\"><![CDATA[1]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"confidence\"><![CDATA[Off]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"spectrum1\"><![CDATA[Off]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"spectrum2\"><![CDATA[Off]]></status-field>");
+		report.addOutputNewline("   </status-fields>");
+		report.addOutputNewline("   <html-annotation><![CDATA[<p>&nbsp;</p>]]></html-annotation>");
 		report.addOutputNewline("</node>");		
+	}
+	
+	public static void writeLink (WriteToFile report, AbstractRequirement source, AbstractRequirement destination)
+	{
+		report.addOutputNewline("<link reference=\"LN"+ LINK_ID +"\">");
+		report.addOutputNewline("   <type>6</type>");
+		report.addOutputNewline("   <strength>1</strength>");
+		report.addOutputNewline("   <source-reference>"+ NODE_IDENTIFIER_MAP.get(source) +"</source-reference>");
+		report.addOutputNewline("   <destination-reference>"+ NODE_IDENTIFIER_MAP.get(destination) +"</destination-reference>");
+		report.addOutputNewline("   <attachment x-source=\"0.5\" y-source=\"0\" x-destination=\"0.5\" y-destination=\"1\"/>");
+		report.addOutputNewline("</link>");
+		LINK_ID = LINK_ID + 1;
 	}
 	
 	public static void generateKey (AbstractRequirement ar)
@@ -61,6 +74,15 @@ public class GeneratorAxml
 		{
 			NODE_IDENTIFIER_MAP.put(ar, "NODE" + NODE_ID);
 			NODE_ID = NODE_ID + 1;
+		}
+	}
+	
+	public static void writeLinks (WriteToFile report, AbstractRequirement req)
+	{
+		for (AbstractRequirement subreq : req.getContainedRequirements())
+		{
+			writeLink (report, req, subreq);
+			writeLinks (report, subreq);
 		}
 	}
 	
@@ -73,6 +95,7 @@ public class GeneratorAxml
 		report.setFileExtension("axml");
 		NODE_IDENTIFIER_MAP = new HashMap<AbstractRequirement,String> ();
 		NODE_ID = 0;
+		LINK_ID = 0;
 		
 		writeAxmlHeader(report);
 		report.addOutputNewline("<nodes>");
@@ -89,6 +112,12 @@ public class GeneratorAxml
 			writeNode (report, ar);
 		}
 		report.addOutputNewline("</nodes>");
+		
+		
+		report.addOutputNewline("<links>");
+		
+		writeLinks (report, requirement);
+		report.addOutputNewline("</links>");
 		
 		report.saveToFile();
 	}
