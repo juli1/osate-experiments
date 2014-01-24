@@ -59,7 +59,7 @@
    	   </perspectiveExtension>
    </extension>
 
-
+<!--
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
@@ -92,7 +92,7 @@
       </objectContribution>
 
    </extension>
-
+-->
 
    
 </plugin>
