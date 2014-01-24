@@ -47,6 +47,8 @@ public class GeneratorAxml
 		generateKey(eo);
 		int xpos;
 		int ypos;
+		int type = 1;
+		
 		String name;
 		String description;
 		
@@ -64,6 +66,7 @@ public class GeneratorAxml
 			{
 				description = "";
 			}
+			type = 2; /* rectangle */
 		}
 		if (eo instanceof AbstractRequirement)
 		{
@@ -74,12 +77,13 @@ public class GeneratorAxml
 			{
 				description = "";
 			}
+			type = 12; /* rectangle */
 		}
 		
 		
 		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(eo)+"\">");
 		report.addOutputNewline("   <layout x=\""+ xpos +"\" y=\""+ypos+"\" height=\""+BOX_HEIGHT+"\" width=\""+BOX_WIDTH+"\"/>");
-		report.addOutputNewline("   <type>12</type>");
+		report.addOutputNewline("   <type>"+type+"</type>");
 		report.addOutputNewline("   <user-id><![CDATA["+name+"]]></user-id>");
 		report.addOutputNewline("   <user-title><![CDATA["+description+"]]></user-title>");
 		report.addOutputNewline("   <status-fields>");
