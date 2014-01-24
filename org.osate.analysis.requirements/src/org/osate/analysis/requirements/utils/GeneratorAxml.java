@@ -9,13 +9,14 @@ import org.osate.aadl2.modelsupport.WriteToFile;
 import org.osate.aadl2.util.OsateDebug;
 
 import fr.openpeople.rdal.model.core.AbstractRequirement;
+import fr.openpeople.rdal.model.core.VerificationActivity;
 import fr.openpeople.rdal.model.core.impl.RequirementImpl;
 
 public class GeneratorAxml
 {
 	private static int NODE_ID;
 	private static int LINK_ID;
-	private static HashMap<AbstractRequirement,String> NODE_IDENTIFIER_MAP;
+	private static HashMap<EObject,String> NODE_IDENTIFIER_MAP;
 	public static final int BOX_WIDTH = 5000;
 	public static final int BOX_HEIGHT = 2000;
 	public static final int YMARGIN = 500;
@@ -41,20 +42,46 @@ public class GeneratorAxml
 		report.addOutputNewline("</general>");
 	}
 	
-	public static void writeNode (WriteToFile report, AbstractRequirement ar)
+	public static void writeNode (WriteToFile report, EObject eo)
 	{
-		generateKey(ar);
+		generateKey(eo);
 		int xpos;
 		int ypos;
+		String name;
+		String description;
 		
+		name = null;
+		description = null;
 		ypos = YMARGIN + (YMARGIN + BOX_HEIGHT) * CURRENT_ROW;
-		
 		xpos = XMARGIN + (XMARGIN + BOX_WIDTH) * NB_ELEMENTS[CURRENT_ROW];
-		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(ar)+"\">");
+		
+		if (eo instanceof VerificationActivity)
+		{
+			name = ((VerificationActivity)eo).getName();
+			description = ((VerificationActivity)eo).getDescription();
+			
+			if (description == null)
+			{
+				description = "";
+			}
+		}
+		if (eo instanceof AbstractRequirement)
+		{
+			name = ((AbstractRequirement)eo).getName();
+			description = ((AbstractRequirement)eo).getDescription();
+			
+			if (description == null)
+			{
+				description = "";
+			}
+		}
+		
+		
+		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(eo)+"\">");
 		report.addOutputNewline("   <layout x=\""+ xpos +"\" y=\""+ypos+"\" height=\""+BOX_HEIGHT+"\" width=\""+BOX_WIDTH+"\"/>");
 		report.addOutputNewline("   <type>12</type>");
-		report.addOutputNewline("   <user-id><![CDATA["+ar.getName()+"]]></user-id>");
-		report.addOutputNewline("   <user-title><![CDATA["+ar.getDescription()+"]]></user-title>");
+		report.addOutputNewline("   <user-id><![CDATA["+name+"]]></user-id>");
+		report.addOutputNewline("   <user-title><![CDATA["+description+"]]></user-title>");
 		report.addOutputNewline("   <status-fields>");
 		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"hasexternalreference\"><![CDATA[False]]></status-field>");
 		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"requiresdevelopment\"><![CDATA[False]]></status-field>");
@@ -74,24 +101,40 @@ public class GeneratorAxml
 		NB_ELEMENTS[CURRENT_ROW] = NB_ELEMENTS[CURRENT_ROW] + 1;
 	
 		CURRENT_ROW = CURRENT_ROW + 1;
-		for (AbstractRequirement sar : ar.getContainedRequirements())
-		{	
-			writeNode (report, sar);
-		}
-		
-		if (ar instanceof RequirementImpl)
+		if (eo instanceof AbstractRequirement)
 		{
-			RequirementImpl reqImpl = (RequirementImpl) ar;
-			for (EObject eo : reqImpl.getRefinedBy())
+			AbstractRequirement ar = (AbstractRequirement)eo;
+			for (AbstractRequirement sar : ar.getContainedRequirements())
 			{	
-				writeNode (report, (AbstractRequirement)eo);
+				writeNode (report, sar);
+			}
+			
+			for (VerificationActivity va : ar.getVerifiedBy())
+			{	
+				writeNode (report, va);
+			}
+			
+			if (ar instanceof RequirementImpl)
+			{
+				RequirementImpl reqImpl = (RequirementImpl) ar;
+				for (EObject tmp : reqImpl.getRefinedBy())
+				{	
+					writeNode (report, (AbstractRequirement)tmp);
+				}
+				
+				for (EObject tmp : reqImpl.getDerivedFrom())
+				{	
+					writeNode (report, (AbstractRequirement)tmp);
+				}
+				
+
 			}
 		}
 		CURRENT_ROW = CURRENT_ROW - 1;
 
 	}
 	
-	public static void writeLink (WriteToFile report, AbstractRequirement source, AbstractRequirement destination)
+	public static void writeLink (WriteToFile report, EObject source, EObject destination)
 	{
 		report.addOutputNewline("<link reference=\"LN"+ LINK_ID +"\">");
 		report.addOutputNewline("   <type>6</type>");
@@ -103,12 +146,25 @@ public class GeneratorAxml
 		LINK_ID = LINK_ID + 1;
 	}
 	
-	public static void generateKey (AbstractRequirement ar)
+	public static void generateKey (EObject eo)
 	{
-		if (! NODE_IDENTIFIER_MAP.containsKey(ar))
+		if (eo instanceof AbstractRequirement)
 		{
-			NODE_IDENTIFIER_MAP.put(ar, "NODE" + NODE_ID);
-			NODE_ID = NODE_ID + 1;
+			AbstractRequirement ar = (AbstractRequirement) eo;
+			if (! NODE_IDENTIFIER_MAP.containsKey(ar))
+			{
+				NODE_IDENTIFIER_MAP.put(ar, "NODE" + NODE_ID);
+				NODE_ID = NODE_ID + 1;
+			}
+		}
+		if (eo instanceof VerificationActivity)
+		{
+			VerificationActivity va = (VerificationActivity) eo;
+			if (! NODE_IDENTIFIER_MAP.containsKey(va))
+			{
+				NODE_IDENTIFIER_MAP.put(va, "NODE" + NODE_ID);
+				NODE_ID = NODE_ID + 1;
+			}
 		}
 	}
 	
@@ -120,6 +176,12 @@ public class GeneratorAxml
 			writeLinks (report, subreq);
 		}
 		
+		
+		for (EObject eo : req.getVerifiedBy())
+		{	
+			writeLink (report, req, (VerificationActivity)eo);
+		}
+		
 		if (req instanceof RequirementImpl)
 		{
 			RequirementImpl reqImpl = (RequirementImpl) req;
@@ -128,6 +190,15 @@ public class GeneratorAxml
 				writeLink (report, req, (AbstractRequirement)eo);
 				writeLinks (report, (AbstractRequirement)eo);	
 			}
+			
+			for (EObject eo : reqImpl.getDerivedFrom())
+			{	
+				writeLink (report, req, (AbstractRequirement)eo);
+				writeLinks (report, (AbstractRequirement)eo);	
+			}
+
+			
+			
 		}
 	}
 	
@@ -138,7 +209,7 @@ public class GeneratorAxml
 		
 		report = new WriteToFile("confidencemap", requirement);
 		report.setFileExtension("axml");
-		NODE_IDENTIFIER_MAP = new HashMap<AbstractRequirement,String> ();
+		NODE_IDENTIFIER_MAP = new HashMap<EObject,String> ();
 		NODE_ID = 0;
 		LINK_ID = 0;
 		
