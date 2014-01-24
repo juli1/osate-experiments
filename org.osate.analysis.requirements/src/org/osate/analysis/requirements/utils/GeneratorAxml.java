@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.modelsupport.WriteToFile;
 import org.osate.aadl2.util.OsateDebug;
 
 import fr.openpeople.rdal.model.core.AbstractRequirement;
+import fr.openpeople.rdal.model.core.impl.RequirementImpl;
 
 public class GeneratorAxml
 {
@@ -18,6 +20,9 @@ public class GeneratorAxml
 	public static final int BOX_HEIGHT = 2000;
 	public static final int YMARGIN = 500;
 	public static final int XMARGIN = 500;
+	private static int NB_ELEMENTS[] = new int[100];
+	private static int CURRENT_ROW = 0;
+	
 	
 	public static void writeAxmlHeader (WriteToFile report)
 	{
@@ -36,11 +41,17 @@ public class GeneratorAxml
 		report.addOutputNewline("</general>");
 	}
 	
-	public static void writeNode (WriteToFile report, AbstractRequirement ar, int xmargin, int ymargin)
+	public static void writeNode (WriteToFile report, AbstractRequirement ar)
 	{
 		generateKey(ar);
+		int xpos;
+		int ypos;
+		
+		ypos = YMARGIN + (YMARGIN + BOX_HEIGHT) * CURRENT_ROW;
+		
+		xpos = XMARGIN + (XMARGIN + BOX_WIDTH) * NB_ELEMENTS[CURRENT_ROW];
 		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(ar)+"\">");
-		report.addOutputNewline("   <layout x=\""+xmargin+"\" y=\""+ymargin+"\" height=\""+BOX_HEIGHT+"\" width=\""+BOX_WIDTH+"\"/>");
+		report.addOutputNewline("   <layout x=\""+ xpos +"\" y=\""+ypos+"\" height=\""+BOX_HEIGHT+"\" width=\""+BOX_WIDTH+"\"/>");
 		report.addOutputNewline("   <type>12</type>");
 		report.addOutputNewline("   <user-id><![CDATA["+ar.getName()+"]]></user-id>");
 		report.addOutputNewline("   <user-title><![CDATA["+ar.getDescription()+"]]></user-title>");
@@ -59,19 +70,25 @@ public class GeneratorAxml
 		report.addOutputNewline("   </status-fields>");
 		report.addOutputNewline("   <html-annotation><![CDATA[<p>&nbsp;</p>]]></html-annotation>");
 		report.addOutputNewline("</node>");
-		int newy = ymargin + BOX_HEIGHT + YMARGIN;
-		int newx = 0;
+		
+		NB_ELEMENTS[CURRENT_ROW] = NB_ELEMENTS[CURRENT_ROW] + 1;
+	
+		CURRENT_ROW = CURRENT_ROW + 1;
 		for (AbstractRequirement sar : ar.getContainedRequirements())
 		{	
-			writeNode (report, sar, newx, newy);
-			newx = newx + BOX_WIDTH + XMARGIN;
+			writeNode (report, sar);
 		}
 		
-//		for (AbstractRequirement sar : ar.get())
-//		{	
-//			writeNode (report, sar, newx, newy);
-//			newx = newx + BOX_WIDTH + XMARGIN;
-//		}
+		if (ar instanceof RequirementImpl)
+		{
+			RequirementImpl reqImpl = (RequirementImpl) ar;
+			for (EObject eo : reqImpl.getRefinedBy())
+			{	
+				writeNode (report, (AbstractRequirement)eo);
+			}
+		}
+		CURRENT_ROW = CURRENT_ROW - 1;
+
 	}
 	
 	public static void writeLink (WriteToFile report, AbstractRequirement source, AbstractRequirement destination)
@@ -102,6 +119,16 @@ public class GeneratorAxml
 			writeLink (report, req, subreq);
 			writeLinks (report, subreq);
 		}
+		
+		if (req instanceof RequirementImpl)
+		{
+			RequirementImpl reqImpl = (RequirementImpl) req;
+			for (EObject eo : reqImpl.getRefinedBy())
+			{	
+				writeLink (report, req, (AbstractRequirement)eo);
+				writeLinks (report, (AbstractRequirement)eo);	
+			}
+		}
 	}
 	
 	public static void generateConfidenceMap (AbstractRequirement requirement)
@@ -115,6 +142,12 @@ public class GeneratorAxml
 		NODE_ID = 0;
 		LINK_ID = 0;
 		
+		for (int i = 0 ; i < 100 ; i++)
+		{
+			NB_ELEMENTS[i] = 0;
+			CURRENT_ROW = 0;
+		}
+		
 		writeAxmlHeader(report);
 		report.addOutputNewline("<nodes>");
 		
@@ -123,7 +156,7 @@ public class GeneratorAxml
 		Utils.gatherAllSubRequirements (requirement, allSubRequirements);
 		
 		generateKey(requirement);
-		writeNode (report, requirement, 0, 0);
+		writeNode (report, requirement);
 
 		report.addOutputNewline("</nodes>");
 		
