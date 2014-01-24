@@ -23,7 +23,7 @@ public class GeneratorAxml
 	public static final int XMARGIN = 500;
 	private static int NB_ELEMENTS[] = new int[100];
 	private static int CURRENT_ROW = 0;
-	
+	private static AbstractRequirement TOP_REQUIREMENT = null;
 	
 	public static void writeAxmlHeader (WriteToFile report)
 	{
@@ -49,6 +49,13 @@ public class GeneratorAxml
 		int ypos;
 		int type = 1;
 		
+		/**
+		 * type = 1 : claim (rectangle with white background)
+		 * type = 3 : defeater (pink rectangle with square-rounded angles)
+		 * type = 13 : round with nothing (end of a defeater)
+		 * type = 8 : inference rule (rectangle with green background)
+		 * type = 2 : evidence (rectanble with rounded angles)
+		 */
 		String name;
 		String description;
 		
@@ -66,8 +73,11 @@ public class GeneratorAxml
 			{
 				description = "";
 			}
-			type = 2; /* rectangle */
+			
+			type = 2;
 		}
+		
+		
 		if (eo instanceof AbstractRequirement)
 		{
 			name = ((AbstractRequirement)eo).getName();
@@ -77,7 +87,14 @@ public class GeneratorAxml
 			{
 				description = "";
 			}
-			type = 12; /* rectangle */
+			if (eo == TOP_REQUIREMENT)
+			{
+				type = 1;
+			}
+			else
+			{
+				type = 3; 
+			}
 		}
 		
 		
@@ -209,11 +226,12 @@ public class GeneratorAxml
 	public static void generateConfidenceMap (AbstractRequirement requirement)
 	{
 		WriteToFile report;
-		List <AbstractRequirement> allSubRequirements;
 		
 		report = new WriteToFile("confidencemap", requirement);
 		report.setFileExtension("axml");
+		
 		NODE_IDENTIFIER_MAP = new HashMap<EObject,String> ();
+		TOP_REQUIREMENT = requirement;
 		NODE_ID = 0;
 		LINK_ID = 0;
 		
@@ -225,11 +243,7 @@ public class GeneratorAxml
 		
 		writeAxmlHeader(report);
 		report.addOutputNewline("<nodes>");
-		
-		allSubRequirements = new ArrayList<AbstractRequirement>();
-		
-		Utils.gatherAllSubRequirements (requirement, allSubRequirements);
-		
+			
 		generateKey(requirement);
 		writeNode (report, requirement);
 
