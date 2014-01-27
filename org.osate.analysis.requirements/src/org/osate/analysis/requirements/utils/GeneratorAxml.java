@@ -33,7 +33,7 @@ public class GeneratorAxml
 		report.addOutputNewline("<project-name><![CDATA[]]></project-name>");
 		report.addOutputNewline("<project-description><![CDATA[]]></project-description>");
 		report.addOutputNewline("<project-author><![CDATA[]]></project-author>");
-		report.addOutputNewline("<interpretation-schema><![CDATA[ASCE-GSN-CM 1.0]]></interpretation-schema>");
+		report.addOutputNewline("<interpretation-schema><![CDATA[ASCE-GSN-CM-1.2]]></interpretation-schema>");
 		report.addOutputNewline("<canvas-units>twips</canvas-units>");
 		report.addOutputNewline("<asce-password></asce-password>");
 		report.addOutputNewline("<tool-version>4.1.7</tool-version>");
@@ -74,7 +74,7 @@ public class GeneratorAxml
 				description = "";
 			}
 			
-			type = 2;
+			type = 3;
 		}
 		
 		
@@ -93,7 +93,7 @@ public class GeneratorAxml
 			}
 			else
 			{
-				type = 3; 
+				type = 1; 
 			}
 		}
 		
@@ -101,13 +101,14 @@ public class GeneratorAxml
 		report.addOutputNewline("<node reference=\""+NODE_IDENTIFIER_MAP.get(eo)+"\">");
 		report.addOutputNewline("   <layout x=\""+ xpos +"\" y=\""+ypos+"\" height=\""+BOX_HEIGHT+"\" width=\""+BOX_WIDTH+"\"/>");
 		report.addOutputNewline("   <type>"+type+"</type>");
-		report.addOutputNewline("   <user-id><![CDATA["+name+"]]></user-id>");
-		report.addOutputNewline("   <user-title><![CDATA["+description+"]]></user-title>");
+		report.addOutputNewline("   <user-id><![CDATA[]]></user-id>");
+		report.addOutputNewline("   <user-title><![CDATA["+name +"-"+ description+"]]></user-title>");
 		report.addOutputNewline("   <status-fields>");
 		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"hasexternalreference\"><![CDATA[False]]></status-field>");
 		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"requiresdevelopment\"><![CDATA[False]]></status-field>");
 		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"requiresinstantiation\"><![CDATA[False]]></status-field>");
-		report.addOutputNewline("	   <status-field type=\"string\" name=\"defeater\"><![CDATA[No]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"cmproperty\"><![CDATA[No]]></status-field>");
+		report.addOutputNewline("	   <status-field type=\"string\" name=\"aadllabel\"><![CDATA[]]></status-field>");
 		report.addOutputNewline("	   <status-field type=\"boolean\" name=\"completed\"><![CDATA[False]]></status-field>");
 		report.addOutputNewline("	   <status-field type=\"string\" name=\"resourced\"><![CDATA[]]></status-field>");
 		report.addOutputNewline("	   <status-field type=\"string\" name=\"comments\"><![CDATA[]]></status-field>");
