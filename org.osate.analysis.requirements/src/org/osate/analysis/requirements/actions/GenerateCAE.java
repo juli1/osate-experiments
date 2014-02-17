@@ -41,6 +41,8 @@ package org.osate.analysis.requirements.actions;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -73,13 +75,14 @@ import org.osate.analysis.requirements.utils.RequirementSelectionDialog;
 import org.osate.analysis.requirements.utils.Utils;
 import org.osgi.framework.Bundle;
 
+
 import fr.openpeople.rdal.model.core.AbstractRequirement;
 import fr.openpeople.rdal.model.core.RequirementsGroup;
 import fr.openpeople.rdal.model.core.Specification;
 
 
 
-public final class GenerateConfidenceMapAction implements IWorkbenchWindowActionDelegate  {
+public final class GenerateCAE implements IWorkbenchWindowActionDelegate  {
 	String selectedRequirement;
 	List<String> selectedModules;
 	
@@ -154,11 +157,12 @@ public final class GenerateConfidenceMapAction implements IWorkbenchWindowAction
 			OsateDebug.osateDebug("ERROR");
 			return;
 		}
-		GeneratorAxml.generateConfidenceMap (requirement);
-		
+		GeneratorCAE.init();
+		GeneratorCAE.generate (null, requirement);
+		GeneratorCAE.save(Utils.getSelectedProject());
 		
 	}
-
+	
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 		

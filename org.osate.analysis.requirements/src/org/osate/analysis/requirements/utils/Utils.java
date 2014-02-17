@@ -48,6 +48,7 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.xtext.ui.util.ResourceUtil;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.modelsupport.WriteToFile;
 import org.osate.aadl2.util.OsateDebug;
@@ -95,9 +96,57 @@ public class Utils
 	
 	public static Resource getResource(IResource ires) {
 		IPath path = ires.getFullPath();
+		
 		return null;
 	}
 
+	public static IProject getSelectedProject ()
+	{
+		ISelection selection;
+		
+		 selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getSelection();
+	        if (selection != null) 
+	        {
+	        	try
+	        	{
+	            if (selection instanceof IStructuredSelection) 
+	            {
+	                if (selection instanceof ITreeSelection) 
+	                {
+	                    TreeSelection treeSelection = (TreeSelection) selection;
+	                    TreePath[] treePaths = treeSelection.getPaths();
+	                    TreePath treePath = treePaths[0];
+
+	                    Object lastSegmentObj = treePath.getLastSegment();
+
+	                    if (lastSegmentObj instanceof CoreResourceImpl)
+	            		{
+	                    	
+	                    	CoreResourceImpl cr = (CoreResourceImpl) lastSegmentObj;
+	                    	IFile file = ResourceUtil.getFile(cr.getResourceSet().getResources().get(0));
+	                    	return file.getProject();
+	            		}
+	                    
+	            		if (lastSegmentObj instanceof IFile
+	            				&& (((IFile) lastSegmentObj).getFileExtension()).equalsIgnoreCase("rdal")) 
+	            		{
+	            			OsateDebug.osateDebug("to be implememted");
+	            			return null;
+	            		}
+	            		
+	            		
+	                    
+	                }
+	            }
+	        	}
+	        	catch (NullPointerException npe)
+	        	{
+	        		npe.printStackTrace();
+	        	}
+	        }
+	        return null;
+	}
+	
 	public static Specification getSelectedRDALModel ()
 	{
 		ISelection selection;

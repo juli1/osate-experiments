@@ -139,7 +139,7 @@ public class GeneratorAxml
 			if (ar instanceof RequirementImpl)
 			{
 				RequirementImpl reqImpl = (RequirementImpl) ar;
-				for (EObject tmp : reqImpl.getRefinedBy())
+				for (EObject tmp : reqImpl.getRefinedBY())
 				{	
 					writeNode (report, (AbstractRequirement)tmp);
 				}
@@ -207,7 +207,7 @@ public class GeneratorAxml
 		if (req instanceof RequirementImpl)
 		{
 			RequirementImpl reqImpl = (RequirementImpl) req;
-			for (EObject eo : reqImpl.getRefinedBy())
+			for (EObject eo : reqImpl.getRefinedBY())
 			{	
 				writeLink (report, req, (AbstractRequirement)eo);
 				writeLinks (report, (AbstractRequirement)eo);	
