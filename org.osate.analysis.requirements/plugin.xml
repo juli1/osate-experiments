@@ -38,16 +38,16 @@
          </visibleWhen>
          </menu>
          <action
-               label="Generate Confidence Map"
+               label="Generate Confidence Map (AXML)"
                class="org.osate.analysis.requirements.actions.GenerateConfidenceMapAction"
-               tooltip="Export AADL into LDM file"
+               tooltip="Export requirements into an AXML file"
                menubarPath="menu.analyses/menu.requirements/stuff.grp"
                icon="icons/cm.gif"
                toolbarPath="rsrc.toolbar"
                id="org.osate.analysis.requirements.actions.GenerateConfidenceMap">
          </action>
          <action
-               label="Generate CAE"
+               label="Generate Assurance Case (CAE)"
                class="org.osate.analysis.requirements.actions.GenerateCAE"
                tooltip="Export the requirements into a CAE notation"
                menubarPath="menu.analyses/menu.requirements/stuff.grp"
