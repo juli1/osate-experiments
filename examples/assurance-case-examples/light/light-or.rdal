@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<core:Specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http:///www.open-people.fr/rdal/core" id="_rRWwgJixEeOytMCr_imBng">
+  <requirementGroups id="_sGXs8ZixEeOytMCr_imBng">
+    <requirements xsi:type="core:Requirement" id="_tYIPxpixEeOytMCr_imBng" name="R1" description="The bulb is functioning property">
+      <subRequirements id="_uHugtpixEeOytMCr_imBng" description="In case we have a incandescent bulb, the following has to be checked" type="Or" requirements="#_4-QlaJixEeOytMCr_imBng"/>
+    </requirements>
+    <requirements xsi:type="core:Requirement" id="_4-QlaJixEeOytMCr_imBng" name="R1.1" description="The filament is intact">
+      <subVerificationActivities id="_MEX6p5iyEeOytMCr_imBng" description="One of these methods can be used to check the filament" type="Or" verificationActivites="#_AcRPGpiyEeOytMCr_imBng #_AySiapiyEeOytMCr_imBng"/>
+    </requirements>
+  </requirementGroups>
+  <verificationActivities id="_AcRPGpiyEeOytMCr_imBng" name="VA1.1.1" description="Check that the bulb does not rafles when shaken"/>
+  <verificationActivities id="_AySiapiyEeOytMCr_imBng" name="VA1.1.2" description="Check that the filament is not visually defective"/>
+</core:Specification>
