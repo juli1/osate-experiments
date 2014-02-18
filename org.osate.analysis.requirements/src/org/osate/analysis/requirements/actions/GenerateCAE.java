@@ -112,7 +112,7 @@ public final class GenerateCAE implements IWorkbenchWindowActionDelegate  {
 		specs = Utils.getSelectedRDALModel();
 		if (specs == null)
 		{
-			OsateDebug.osateDebug("null specs");
+			OsateDebug.osateDebug("[GenerateCAE] null specs");
 			return;
 		}
 		
@@ -154,7 +154,7 @@ public final class GenerateCAE implements IWorkbenchWindowActionDelegate  {
 		if (requirement == null)
 		{
 			//FIXME should show a dialogbox for error
-			OsateDebug.osateDebug("ERROR");
+			OsateDebug.osateDebug("[GenerateCAE] ERROR");
 			return;
 		}
 		GeneratorCAE.init();

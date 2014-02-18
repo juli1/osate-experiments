@@ -42,7 +42,7 @@ public class GeneratorCAE
 
 	private static ArgumentDiagram argumentDiagram = f.createArgumentDiagram();
 	private static int id = 1;
-
+	private final static int SUBSTR_LEN = 15;
 
 	public static void init ()
 	{
@@ -52,6 +52,7 @@ public class GeneratorCAE
 	
 	public static void generate (ArgumentElement parent, IdentifiedElement entity)
 	{
+		String content = "";
 		if (entity == null)
 		{
 			return;	
@@ -61,9 +62,15 @@ public class GeneratorCAE
 			Requirement ar = (Requirement) entity;
 			Claim claim = f.createClaim();
 
+			content = ar.getName();
+			if (ar.getDescription() != null)
+			{
+				content += " - " + ar.getDescription().substring(0, SUBSTR_LEN) + " ...";
+			}
+			
 			claim.setIdentifier(Integer.toString(id++));
-			claim.setContent(ar.getName());
-
+			claim.setContent(content);
+			claim.setDescription(ar.getDescription());
 			argumentDiagram.getClaims().add(claim);
 			if (parent != null) 
 			{
@@ -87,15 +94,26 @@ public class GeneratorCAE
 		{
 			RequirementsContainer rc = (RequirementsContainer) entity;
 			Argument arg = f.createArgument();
+			
+			
 			if(rc.getType() == ContainerType.AND)
 			{
-				arg.setContent("AND");
+				content = "AND";
 			}
 			
 			if(rc.getType() == ContainerType.OR)
 			{
-				arg.setContent("OR");
+				content = "OR";
 			}
+			
+			if (rc.getDescription() != null)
+			{
+				content += " - " + rc.getDescription().substring(0, SUBSTR_LEN) + " ...";
+			}
+			
+			arg.setContent(content);
+			
+			arg.setDescription(rc.getDescription());
 			argumentDiagram.getArguments().add(arg);
 
 			if (parent != null) 
@@ -121,8 +139,15 @@ public class GeneratorCAE
 		{
 			VerificationActivity va = (VerificationActivity) entity;
 			Evidence ev = f.createEvidence();
-			ev.setContent(va.getName());
 			
+			content = va.getName();
+			if (va.getDescription() != null)
+			{
+				content += " - " + va.getDescription().substring(0, SUBSTR_LEN) + " ...";
+			}
+			
+			ev.setContent(content);
+			ev.setDescription(va.getDescription());
 			argumentDiagram.getEvidence().add(ev);
 
 			if (parent != null) 
