@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<core:Specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:core="http:///www.open-people.fr/rdal/core" id="_mkD_IJiqEeOapPKeAgORuQ">
+  <requirementGroups id="_nSPTwZiqEeOapPKeAgORuQ">
+    <requirements xsi:type="core:Requirement" id="_7gMa1piqEeOapPKeAgORuQ" name="R1" description="Light can be turned on">
+      <subRequirements id="_L2sIIJirEeOapPKeAgORuQ" description="All the requirements must be met to ensure connection from power to the bulb" requirements="#__P5mzZiqEeOapPKeAgORuQ #__o-OF5iqEeOapPKeAgORuQ #_AyI1nZirEeOapPKeAgORuQ"/>
+    </requirements>
+    <requirements xsi:type="core:Requirement" id="__P5mzZiqEeOapPKeAgORuQ" name="R1.1" description="Switch is connected to a power source" verifiedBy="#_ovtXWpiqEeOapPKeAgORuQ"/>
+    <requirements xsi:type="core:Requirement" id="__o-OF5iqEeOapPKeAgORuQ" name="R1.2" description="The bulb is functioning" verifiedBy="#_pRf1ypiqEeOapPKeAgORuQ"/>
+    <requirements xsi:type="core:Requirement" id="_AyI1nZirEeOapPKeAgORuQ" name="R1.3" description="The switch is connected" verifiedBy="#_p4mSCpiqEeOapPKeAgORuQ"/>
+  </requirementGroups>
+  <verificationActivities id="_ovtXWpiqEeOapPKeAgORuQ" name="VA1" description="Manual Check that the switch is connected" requirement="#__P5mzZiqEeOapPKeAgORuQ" verificationMethod="Inspection"/>
+  <verificationActivities id="_pRf1ypiqEeOapPKeAgORuQ" name="VA2" description="Check that the buld is functioning" requirement="#__o-OF5iqEeOapPKeAgORuQ"/>
+  <verificationActivities id="_p4mSCpiqEeOapPKeAgORuQ" name="VA3" description="Check Switch Connection" requirement="#_AyI1nZirEeOapPKeAgORuQ" verificationMethod="Inspection"/>
+</core:Specification>
