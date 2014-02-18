@@ -34,6 +34,7 @@ import fr.openpeople.rdal.model.core.IdentifiedElement;
 import fr.openpeople.rdal.model.core.Requirement;
 import fr.openpeople.rdal.model.core.RequirementsContainer;
 import fr.openpeople.rdal.model.core.VerificationActivity;
+import fr.openpeople.rdal.model.core.VerificationActivityContainer;
 import fr.openpeople.rdal.model.core.impl.RequirementImpl;
 
 public class GeneratorCAE
@@ -71,6 +72,7 @@ public class GeneratorCAE
 			claim.setIdentifier(Integer.toString(id++));
 			claim.setContent(content);
 			claim.setDescription(ar.getDescription());
+			
 			argumentDiagram.getClaims().add(claim);
 			if (parent != null) 
 			{
@@ -87,6 +89,11 @@ public class GeneratorCAE
 			for (VerificationActivity vatmp : ar.getVerifiedBy())
 			{
 				generate (parent, vatmp);
+			}
+			
+			if ((ar.getSubVerificationActivities() != null) && (ar.getSubVerificationActivities().getVerificationActivites().size() > 0))
+			{
+				generate (parent, ar.getSubVerificationActivities());
 			}
 		}
 
@@ -133,6 +140,49 @@ public class GeneratorCAE
 			}
 		}
 		
+		if (entity instanceof VerificationActivityContainer)
+		{
+			VerificationActivityContainer vac = (VerificationActivityContainer) entity;
+			Argument arg = f.createArgument();
+			
+			
+			if(vac.getType() == ContainerType.AND)
+			{
+				content = "AND";
+			}
+			
+			if(vac.getType() == ContainerType.OR)
+			{
+				content = "OR";
+			}
+			
+			if (vac.getDescription() != null)
+			{
+				content += " - " + vac.getDescription().substring(0, SUBSTR_LEN) + " ...";
+			}
+			
+			arg.setContent(content);
+			
+			arg.setDescription(vac.getDescription());
+			argumentDiagram.getArguments().add(arg);
+
+			if (parent != null) 
+			{
+				if (parent instanceof Claim)
+				{
+					Claim c = (Claim) parent;
+					c.getClaimStrategies().add (arg);
+				}
+			}
+			
+			parent = arg;
+			
+			for (VerificationActivity rtmp : vac.getVerificationActivites())
+			{
+				generate(parent, rtmp);
+			}
+		}
+		
 		
 
 		if (entity instanceof VerificationActivity)
@@ -156,6 +206,12 @@ public class GeneratorCAE
 				{
 					Claim c = (Claim) parent;
 					c.getClaimSolutions().add (ev);
+				}
+				
+				if (parent instanceof Argument)
+				{
+					Argument a = (Argument) parent;
+					a.getArgumentEvidence().add (ev);
 				}
 			}
 
